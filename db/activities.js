@@ -1,13 +1,14 @@
 const client = require("./client")
 
 
-const createActivity = async (activityName, description) => {
+const createActivity = async (name, description) => {
   try {
     const { rows: [activity] } = await client.query(`
     INSERT INTO activities (name, description)
-    VALUES ('${activityName}', '${description}')
-    RETURNING *;
-  `)
+    VALUES ($1, $2)
+    RETURNING*;
+  `,[name, description]);
+  console.log( `NAME`,name)
     return activity
   } catch (error) {
     console.log(error)
@@ -28,7 +29,33 @@ const getActivities = async () => {
 
 }
 
+const getOneActivity = async(id)=>{
+  
+  try{
+    const {rows:[activity]}= await client.query(`
+      SELECT * FROM activities
+      WHERE id = $1;
+    `,[id]);
+    return activity;
+   
+   
+  } catch(error) {
+    console.log(error)
+  }
+}
 
+const deleteActivity =async(id)=>{
+  try {
+    const { rows: [activiy] } = await client.query(`
+        DELETE FROM activities
+        WHERE id=$1
+        RETURNING *;
+    `, [id]);
+    return activiy;
+} catch (error) {
+    throw error;
+}
+}
 
 
 
@@ -36,6 +63,9 @@ const getActivities = async () => {
 module.exports = {
 
   createActivity,
-  getActivities
+  getActivities,
+  getOneActivity,
+  deleteActivity
+  
 
 }

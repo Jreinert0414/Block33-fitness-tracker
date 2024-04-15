@@ -5,9 +5,9 @@ const createRoutine = async (routineName, isPublic, goalDescription) => {
   try {
     const {rows:[routine]}= await client.query(`
     INSERT INTO routines (name, is_public, goal)
-    VALUES ('${routineName}', '${isPublic}', '${goalDescription}')
+    VALUES ($1,$2,$3)
     RETURNING *;
-    `)
+    `,[routineName, isPublic, goalDescription])
     return routine
 } catch (error){
   console.log(error)
@@ -26,10 +26,40 @@ const getRoutines = async () => {
 }
 
 
+const getOneRoutine = async(id)=>{
+  
+  try{
+    const {rows:[routine]}= await client.query(`
+      SELECT * FROM routines
+      WHERE id = $1;
+    `,[id]);
+    return routine;
+   
+   
+  } catch(error) {
+    console.log(error)
+  }
+}
+
+const deleteRoutine =async(id)=>{
+  try {
+    const { rows: [routine] } = await client.query(`
+        DELETE FROM routines
+        WHERE id=$1
+        RETURNING *;
+    `, [id]);
+    return routine;
+} catch (error) {
+    throw error;
+}
+}
+
 
 module.exports= {
  
   createRoutine,
-  getRoutines
+  getRoutines,
+  getOneRoutine,
+  deleteRoutine
 
 }
